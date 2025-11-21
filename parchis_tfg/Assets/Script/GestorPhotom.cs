@@ -21,11 +21,11 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        PhotonNetwork.JoinOrCreateRoom("Cuatro", new RoomOptions { MaxPlayers = 4 }, TypedLobby.Default);
+        //PhotonNetwork.JoinOrCreateRoom("Cuatro", new RoomOptions { MaxPlayers = 4 }, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.Instantiate("JAmarillo", new Vector3(Random.Range(-1, 1), 2), Quaternion.identity);
+       // PhotonNetwork.Instantiate("JAmarillo", new Vector3(Random.Range(-1, 1), 2), Quaternion.identity);
     }
 }
