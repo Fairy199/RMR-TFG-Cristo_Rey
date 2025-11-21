@@ -3,6 +3,7 @@ using TMPro;
 
 public class GameControl : MonoBehaviour
 {
+    public static int diceSideThrown = 0;
     public static bool gameOver = false;
 
     private static FollowThePath jugador1Path;
@@ -28,9 +29,11 @@ public class GameControl : MonoBehaviour
         jugador2MueveTexto.SetActive(false);
     }
 
-    public static void MoverJugador(int jugador)
+    public static void JugarTurno()
     {
-        if (jugador == 1)
+        if (gameOver) return;
+
+        if (turno == 1)
         {
             jugador1Path.Mover(diceSideThrown);
             jugador1MueveTexto.SetActive(false);
@@ -43,6 +46,26 @@ public class GameControl : MonoBehaviour
             jugador2MueveTexto.SetActive(false);
             jugador1MueveTexto.SetActive(true);
             turno = 1;
+        }
+    }
+
+    private void Update()
+    {
+        // Comprobar victorias
+        if (!gameOver)
+        {
+            if (jugador1Path.PuntoDeCaminoIndex >= jugador1Path.PuntoDeCamino.Length)
+            {
+                quienGanaTexto.SetActive(true);
+                quienGanaTexto.GetComponent<TMP_Text>().text = "Jugador 1 gana";
+                gameOver = true;
+            }
+            else if (jugador2Path.PuntoDeCaminoIndex >= jugador2Path.PuntoDeCamino.Length)
+            {
+                quienGanaTexto.SetActive(true);
+                quienGanaTexto.GetComponent<TMP_Text>().text = "Jugador 2 gana";
+                gameOver = true;
+            }
         }
     }
 }
