@@ -49,9 +49,24 @@ public class GameControl : MonoBehaviour
         }
     }
 
+    public static void RepetirTurno()
+    {
+        if (turno == 1)
+        {
+            turno = 2;
+            jugador2MueveTexto.SetActive(false);
+            jugador1MueveTexto.SetActive(true);
+        }
+        else
+        {
+            turno = 1;
+            jugador1MueveTexto.SetActive(false);
+            jugador2MueveTexto.SetActive(true);
+        }
+    }
+
     private void Update()
     {
-        // Comprobar victorias
         if (!gameOver)
         {
             if (jugador1Path.PuntoDeCaminoIndex >= jugador1Path.PuntoDeCamino.Length)
@@ -60,6 +75,7 @@ public class GameControl : MonoBehaviour
                 quienGanaTexto.GetComponent<TMP_Text>().text = "Jugador 1 gana";
                 gameOver = true;
             }
+
             else if (jugador2Path.PuntoDeCaminoIndex >= jugador2Path.PuntoDeCamino.Length)
             {
                 quienGanaTexto.SetActive(true);

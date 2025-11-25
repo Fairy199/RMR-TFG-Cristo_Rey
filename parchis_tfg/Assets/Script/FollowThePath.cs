@@ -1,5 +1,13 @@
 using UnityEngine;
 
+[System.Serializable]
+public class CasillaEspecial
+{
+    public int casillaOrigen;   
+    public int casillaDestino;  
+    public bool repetirTurno;   
+}
+
 public class FollowThePath : MonoBehaviour
 {
     public Transform[] PuntoDeCamino;
@@ -9,6 +17,8 @@ public class FollowThePath : MonoBehaviour
     public bool puedesMoverte = false;
 
     private int pasosRestantes = 0;
+
+    public CasillaEspecial[] casillasEspeciales;
 
     public void Mover(int pasos)
     {
@@ -35,7 +45,31 @@ public class FollowThePath : MonoBehaviour
                 pasosRestantes--;
 
                 if (pasosRestantes <= 0)
+                {
                     puedesMoverte = false;
+                    RevisarCasillaEspecial();
+                }
+            }
+        }
+    }
+
+    private void RevisarCasillaEspecial()
+    {
+        int casillaActual = PuntoDeCaminoIndex - 1;
+
+        foreach (var casilla in casillasEspeciales)
+        {
+            if (casillaActual == casilla.casillaOrigen)
+            {
+
+                PuntoDeCaminoIndex = casilla.casillaDestino;
+                transform.position = PuntoDeCamino[PuntoDeCaminoIndex].position;
+
+                
+                if (casilla.repetirTurno)
+                {
+                    GameControl.RepetirTurno();
+                }
             }
         }
     }
