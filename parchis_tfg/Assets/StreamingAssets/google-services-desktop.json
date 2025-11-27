@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "777998825586",
+    "project_id": "parchis-5df54",
+    "storage_bucket": "parchis-5df54.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777998825586:android:d5101a82dc828290f4eaeb",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.parchis_tfg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKM7PCEuEpLzTw_k7887QgIMHhtJYhPIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
