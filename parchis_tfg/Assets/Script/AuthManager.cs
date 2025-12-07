@@ -3,6 +3,7 @@ using Firebase;
 using Firebase.Auth;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class AuthManager : MonoBehaviour
 {
@@ -25,11 +26,11 @@ public class AuthManager : MonoBehaviour
     public TMP_Text warningRegisterText;
     public TMP_Text confirmRegisterText;
 
-    [Header("Panels")]                     // <<< NUEVO
+    [Header("Panels")]                     
     public GameObject PanelLogin;
     public GameObject PanelRegister;
 
-    [Header("Buttons")]                    // <<< NUEVO
+    [Header("Buttons")]                    
     public GameObject loginButtons;
     public GameObject registerButtons;
 
@@ -78,6 +79,7 @@ public class AuthManager : MonoBehaviour
         {
             user = loginTask.Result.User;
             confirmLoginText.text = "Login successful!";
+            SceneManager.LoadScene("Menu");
         }
     }
 

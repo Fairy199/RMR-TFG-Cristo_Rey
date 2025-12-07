@@ -6,22 +6,31 @@ using System.Threading.Tasks;
 
 public class LeaderboardManager : MonoBehaviour
 {
-    public Transform contentPanel;
-    public GameObject entryPrefab;
+    [Header("Leaderboard UI")]
+    public Transform contentPanel;      // El Content del Scroll
+    public GameObject entryPrefab;      // Prefab con el script LeaderboardEntry
 
     private FirebaseControlador firebase;
 
     private async void Start()
     {
+        // Inicializar Firebase
         firebase = new FirebaseControlador();
         await firebase.InitializeFirebaseAsync();
 
+        // Cargar leaderboard
         await LoadLeaderboard();
     }
 
     public async Task LoadLeaderboard()
     {
-        var snapshot = await firebase.GetDataOfRankingFromDatabaseAsync();
+        if (firebase == null || firebase.database == null)
+        {
+            Debug.LogError("Firebase no está inicializado correctamente.");
+            return;
+        }
+
+        var snapshot = await firebase.GetRankingAsync();
 
         if (snapshot == null || !snapshot.Exists)
         {
@@ -29,24 +38,41 @@ public class LeaderboardManager : MonoBehaviour
             return;
         }
 
-        List<RankingData> entries = new List<RankingData>();
+        // Limpiar contenido previo
+        foreach (Transform child in contentPanel)
+            Destroy(child.gameObject);
 
+        // Recorrer cada usuario en LeaderBoard
         foreach (var child in snapshot.Children)
         {
-            string json = child.Value.ToString();
-            RankingData data = JsonUtility.FromJson<RankingData>(json);
-            entries.Add(data);
-        }
+            var usernameValue = child.Child("username")?.Value;
+            var scoreValue = child.Child("score")?.Value;
 
-        // Ordenar por puntuación descendente
-        entries.Sort((a, b) => b.score.CompareTo(a.score));
+            if (usernameValue == null || scoreValue == null)
+            {
+                Debug.LogWarning($"Usuario {child.Key} tiene datos inválidos.");
+                continue;
+            }
 
-        // Pintar en UI
-        foreach (var data in entries)
-        {
+            string username = usernameValue.ToString();
+            string score = scoreValue.ToString();
+
+            // Instanciar prefab
             GameObject newEntry = Instantiate(entryPrefab, contentPanel);
-            newEntry.transform.Find("NameText").GetComponent<TextMeshProUGUI>().text = data.playerName;
-            newEntry.transform.Find("ScoreText").GetComponent<TextMeshProUGUI>().text = data.score.ToString();
+            newEntry.transform.localScale = Vector3.one;
+
+            // Asignar valores usando el script LeaderboardEntry
+            var entryScript = newEntry.GetComponent<LeaderBoardEntry>();
+            if (entryScript != null)
+            {
+                entryScript.usernameText.text = username;
+                entryScript.scoreText.text = score;
+            }
+            else
+            {
+                Debug.LogError("El prefab necesita el script LeaderboardEntry con referencias asignadas.");
+                Destroy(newEntry);
+            }
         }
     }
 }
