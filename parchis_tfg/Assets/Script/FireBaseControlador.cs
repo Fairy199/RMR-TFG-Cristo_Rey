@@ -13,11 +13,10 @@ public class RankingData
     public int score;
     public string date;
 
-    public RankingData(string playerName, int score, string date)
+    public RankingData(string playerName, int score)
     {
         this.playerName = playerName;
         this.score = score;
-        this.date = date;
     }
 }
 
@@ -35,7 +34,8 @@ public class FirebaseControlador
         {
             auth = FirebaseAuth.DefaultInstance;
             user = auth.CurrentUser;
-            database = FirebaseDatabase.DefaultInstance.RootReference;
+            database = FirebaseDatabase.GetInstance("https://ocaunity-default-rtdb.europe-west1.firebasedatabase.app/").RootReference;
+
             Debug.Log("Firebase inicializado correctamente.");
         }
         else
