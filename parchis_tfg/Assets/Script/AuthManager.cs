@@ -4,6 +4,7 @@ using Firebase.Auth;
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class AuthManager : MonoBehaviour
 {
@@ -78,6 +79,13 @@ public class AuthManager : MonoBehaviour
         else
         {
             user = loginTask.Result.User;
+
+            // Establecer nickname en Photon antes de conectar
+            PhotonNetwork.NickName = user.DisplayName ?? "Jugador";
+
+            // Conectar a Photon
+            PhotonNetwork.ConnectUsingSettings();
+
             confirmLoginText.text = "Login successful!";
             SceneManager.LoadScene("Menu");
         }
