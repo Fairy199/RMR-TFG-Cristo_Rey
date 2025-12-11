@@ -24,6 +24,7 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
     void Start()
     {
         if (btnConect != null) btnConect.SetActive(false);
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     public void CreatePlayer(string namePlayer)
@@ -65,6 +66,14 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
         windowsHandler.EnableWindow(0);
         StartCoroutine(UpdateTextSala());
         Debug.Log("Estamos conectados a la sala " + PhotonNetwork.CurrentRoom.Name + " Bienvenido " + PhotonNetwork.NickName);
+    }
+
+    public void StartScene()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Tablero");
+        }
     }
 
     IEnumerator UpdateTextSala()
