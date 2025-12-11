@@ -1708,7 +1708,7 @@ RectTransform:
   m_Father: {fileID: 2074757287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2326,7 +2326,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 9.919678, w: 0}
+  m_margin: {x: -591.86786, y: 0, z: -579.364, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2882,12 +2882,13 @@ GameObject:
   m_Component:
   - component: {fileID: 1470323020}
   - component: {fileID: 1470323019}
+  - component: {fileID: 1470323021}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!114 &1470323019
 MonoBehaviour:
@@ -2901,7 +2902,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc60227d3e34864dbb1cb3a6a306fcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GestorPhotom
+  windowsHandler: {fileID: 1470323021}
   textIndicator: {fileID: 437184044}
+  textNameSala: {fileID: 1198614650}
+  contentPlayers: {fileID: 1924146257}
+  nickNamePlayer: {fileID: 6080581787463738871, guid: fd04b643edcb90d4aa19d640a1690baa, type: 3}
+  btnConect: {fileID: 1989127085}
 --- !u!4 &1470323020
 Transform:
   m_ObjectHideFlags: 0
@@ -2917,6 +2923,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1470323021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470323018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b25fa97accfe2540ab8cd5c9dda1736, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WindowsHandler
+  windows:
+  - {fileID: 849696367}
 --- !u!1 &1479600930
 GameObject:
   m_ObjectHideFlags: 0
@@ -3299,7 +3319,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -41.717224, y: 78.068115}
+  m_AnchoredPosition: {x: -41.717285, y: 78.068115}
   m_SizeDelta: {x: -746.3776, y: -387.9977}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1924146258
@@ -3584,7 +3604,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1989127088}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1470323019}
+        m_TargetAssemblyTypeName: GestorPhotom, Assembly-CSharp
+        m_MethodName: CreateRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1989127088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3703,9 +3735,9 @@ RectTransform:
   m_Father: {fileID: 1367737281}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2025888520
 MonoBehaviour:
@@ -3776,7 +3808,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2068503392
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3921,7 +3953,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -0, y: -0.000045776367}
-  m_SizeDelta: {x: -931.52686, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2099479143
 MonoBehaviour:

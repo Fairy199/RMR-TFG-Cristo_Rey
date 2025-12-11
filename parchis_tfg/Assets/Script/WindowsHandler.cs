@@ -2,15 +2,17 @@ using UnityEngine;
 
 public class WindowsHandler : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public GameObject[] windows;
+    public void EnableWindow(int idWindow)
     {
-        
-    }
+        windows[idWindow].SetActive(true);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        for (int i = 0; i < windows.Length; i++)
+        {
+            if (idWindow != i)
+            {
+                windows[i].SetActive(false);
+            }
+        }
     }
 }

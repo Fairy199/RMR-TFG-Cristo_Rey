@@ -2,14 +2,28 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using System.Collections; 
 
 public class GestorPhotom : MonoBehaviourPunCallbacks
 {
+    [Header("Instancias de scripts")]
+    public WindowsHandler windowsHandler;
+
+    [Header("Indicadores")]
     public TMP_Text textIndicator;
+    public TMP_Text textNameSala;
+    public Transform contentPlayers;
+
+    [Header("Prefabs")]
+    public GameObject nickNamePlayer;
+
+    [Header("Botones Menu")]
+    public GameObject btnConect;
+
+    private int countPlayer = 0;
     void Start()
     {
-        if (!PhotonNetwork.IsConnected)
-            PhotonNetwork.ConnectUsingSettings();
+        if (btnConect != null) btnConect.SetActive(false);
     }
 
     public void CreatePlayer(string namePlayer)
@@ -19,30 +33,67 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
 
     public override void OnConnected()
     {
-        //PhotonNetwork.JoinLobby();
         base.OnConnected();
-        Debug.Log("Conectado a photon");
-        textIndicator.text = "Conectado correctamente";
+        Debug.Log("Conectado a Photon");
+        if (textIndicator != null) textIndicator.text = "Conectado correctamente";
     }
 
     public override void OnConnectedToMaster()
     {
         base.OnConnectedToMaster();
-        textIndicator.text = "Bienvendio "+ PhotonNetwork.NickName;
+        if (textIndicator != null) textIndicator.text = "Bienvenido " + PhotonNetwork.NickName;
+        if (btnConect != null) btnConect.SetActive(true);
     }
 
-    /*public override void OnDisconnected(DisconectCause cause)
+    public void CreateRoom()
     {
-        base.OnDisconnected(cause);
-    }*/
-/*
-    public override void OnJoinedLobby()
-    {
-        //PhotonNetwork.JoinOrCreateRoom("Cuatro", new RoomOptions { MaxPlayers = 4 }, TypedLobby.Default);
+        string nameRoom = "Sala";
+
+        RoomOptions optionsRoom = new RoomOptions
+        {
+            IsVisible = true,
+            MaxPlayers = 2,
+            PublishUserId = true
+        };
+
+        PhotonNetwork.JoinOrCreateRoom(nameRoom, optionsRoom, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
-       // PhotonNetwork.Instantiate("JAmarillo", new Vector3(Random.Range(-1, 1), 2), Quaternion.identity);
-    }*/
+        base.OnJoinedRoom();
+        windowsHandler.EnableWindow(0);
+        StartCoroutine(UpdateTextSala());
+        Debug.Log("Estamos conectados a la sala " + PhotonNetwork.CurrentRoom.Name + " Bienvenido " + PhotonNetwork.NickName);
+    }
+
+    IEnumerator UpdateTextSala()
+    {
+        while (true)
+        {
+            textNameSala.text = $"Nombre sala: {PhotonNetwork.CurrentRoom.Name} - #Jugadores: {PhotonNetwork.CurrentRoom.PlayerCount}";
+            yield return new WaitForSeconds(0.2f);
+
+            if (PhotonNetwork.CurrentRoom.Players.Count > countPlayer)
+            {
+                countPlayer = PhotonNetwork.CurrentRoom.Players.Count;
+                foreach (var item in PhotonNetwork.CurrentRoom.Players)
+                {
+                    GameObject nickName = Instantiate(nickNamePlayer, contentPlayers);
+                    nickName.GetComponent<TMP_Text>().text = item.Value.NickName;
+                }
+            }
+
+            //PhotonNetwork.CurrentRoom.Players[0].NickName;
+            
+
+        }
+    }
+
+    /*
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        base.OnDisconnected(cause);
+    }
+    */
 }
