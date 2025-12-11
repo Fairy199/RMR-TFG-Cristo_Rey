@@ -72,7 +72,7 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("Tablero");
+            PhotonNetwork.LoadLevel("TableroOnline");
         }
     }
 
