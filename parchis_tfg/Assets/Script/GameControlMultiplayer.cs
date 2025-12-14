@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using ExitGames.Client.Photon;
 
 public class GameControlMultiplayer : MonoBehaviourPunCallbacks
 {
@@ -13,20 +15,39 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
     private static TMP_Text quienGanaTexto;
     private static TMP_Text jugadorMueveTexto;
 
-    private static int turno = 1;
+    // -------------------------------
+    // TURNO GLOBAL SINCRONIZADO
+    // -------------------------------
+    public static int Turno
+    {
+        get
+        {
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("turno", out object value))
+                return (int)value;
+            return 1;
+        }
+        set
+        {
+            ExitGames.Client.Photon.Hashtable h = new ExitGames.Client.Photon.Hashtable();
+            h["turno"] = value;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+        }
+    }
 
     void Start()
     {
-        // Referencias UI
         quienGanaTexto = GameObject.Find("quienGanaTexto").GetComponent<TMP_Text>();
         jugadorMueveTexto = GameObject.Find("jugador1MueveTexto").GetComponent<TMP_Text>();
         quienGanaTexto.gameObject.SetActive(false);
         jugadorMueveTexto.gameObject.SetActive(false);
 
         gameOver = false;
-        turno = 1;
 
-        // Registrar el jugador local
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Turno = 1; // SOLO EL MASTER MARCA EL TURNO INICIAL
+        }
+
         RegisterLocalPlayer();
         ActualizarTurnoUI();
     }
@@ -37,9 +58,7 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
         {
             var ftp = go.GetComponent<FollowThePathMultiplayer>();
             if (ftp != null && ftp.photonView.IsMine)
-            {
                 RegisterPlayer(ftp);
-            }
         }
     }
 
@@ -48,17 +67,16 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
         if (!players.Contains(ftp))
         {
             players.Add(ftp);
-            Debug.Log($">> Jugador registrado: {ftp.name}, ActorNumber: {ftp.photonView.Owner.ActorNumber}");
+            Debug.Log($">> Jugador registrado: {ftp.name}");
         }
     }
 
-    // Cuando entra un jugador nuevo a la sala
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         StartCoroutine(WaitAndRegister(newPlayer.ActorNumber));
     }
 
-    private System.Collections.IEnumerator WaitAndRegister(int actorNumber)
+    private IEnumerator WaitAndRegister(int actorNumber)
     {
         PhotonView pv = null;
         while (pv == null)
@@ -75,15 +93,13 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
         }
 
         var ftp = pv.GetComponent<FollowThePathMultiplayer>();
-        if (ftp != null)
-            RegisterPlayer(ftp);
+        if (ftp != null) RegisterPlayer(ftp);
     }
 
     void Update()
     {
         if (gameOver || players.Count == 0) return;
 
-        // Revisar victoria
         foreach (var player in players)
         {
             if (player.PuntoDeCaminoIndex >= player.PuntoDeCamino.Length)
@@ -96,68 +112,73 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
         }
     }
 
-    // -----------------------------
-    // MÉTODOS DE TURNOS
-    // -----------------------------
-    public static void JugarTurno()
+    // ------------------------------------
+    //       MÉTODOS DE TURNOS
+    // ------------------------------------
+
+    public static void AvanzarTurno()
     {
-        if (gameOver || players.Count == 0) return;
-
-        FollowThePathMultiplayer jugadorActual = players[turno - 1];
-        if (jugadorActual.photonView.IsMine)
-        {
-            jugadorActual.Mover(diceSideThrown);
-        }
-
-        turno++;
-        if (turno > players.Count) turno = 1;
-
-        ActualizarTurnoUI();
+        int nuevo = Turno + 1;
+        if (nuevo > players.Count) nuevo = 1;
+        Turno = nuevo;
     }
 
     public static void RepetirTurno()
     {
-        if (players.Count == 0) return;
-
-        turno--;
-        if (turno < 1) turno = players.Count;
-
-        ActualizarTurnoUI();
+        int nuevo = Turno - 1;
+        if (nuevo < 1) nuevo = players.Count;
+        Turno = nuevo;
     }
 
     private static void ActualizarTurnoUI()
     {
         if (jugadorMueveTexto != null)
-            jugadorMueveTexto.text = $"Turno jugador {turno}";
+            jugadorMueveTexto.text = $"Turno jugador {Turno}";
     }
 
-    // -----------------------------
-    // MÉTODOS DE TEST
-    // -----------------------------
+    // 👇 AQUÍ ESTABA EL ERROR (ya corregido)
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable changed)
+    {
+        if (changed.ContainsKey("turno"))
+            ActualizarTurnoUI();
+    }
+
+    // ------------------------------------
+    //      MÉTODOS DE TEST Y MOVIMIENTO
+    // ------------------------------------
+
     public static void TestTurn()
     {
-        Debug.Log($">> Turno testeado por: {PhotonNetwork.LocalPlayer.NickName}");
-        JugarTurno();
+        FollowThePathMultiplayer jugadorActual = players[Turno - 1];
+
+        if (!jugadorActual.photonView.IsMine)
+        {
+            Debug.Log(">> No es tu turno.");
+            return;
+        }
+
+        jugadorActual.Mover(diceSideThrown);
+        AvanzarTurno();
     }
 
     public static void TestMovimiento()
     {
-        if (players.Count == 0 || gameOver)
+        FollowThePathMultiplayer jugadorActual = players[Turno - 1];
+
+        if (!jugadorActual.photonView.IsMine)
         {
-            Debug.Log("Mov test cancelado: juego no iniciado.");
+            Debug.Log(">> No es tu turno.");
             return;
         }
 
-        FollowThePathMultiplayer jugadorActual = players[turno - 1];
-
-        if (jugadorActual.photonView.IsMine)
-        {
-            Debug.Log($">> TEST MOVIMIENTO ejecutado por {PhotonNetwork.LocalPlayer.NickName}");
-            jugadorActual.Mover(3);
-        }
-        else
-        {
-            Debug.Log(">> NO ES TU TURNO, no puedes mover.");
-        }
+        jugadorActual.Mover(3);
     }
+
+    public static bool TurnoJugadorSoyYo()
+    {
+        if (players.Count == 0) return false;
+
+        return players[Turno - 1].photonView.IsMine;
+    }
+
 }

@@ -386,6 +386,7 @@ MonoBehaviour:
   - {fileID: 769079351}
   - {fileID: 1516656563}
   - {fileID: 489797249}
+  playerPrefabName: Jugador1
 --- !u!4 &90849755
 Transform:
   m_ObjectHideFlags: 0
@@ -1373,19 +1374,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2106016489}
         m_TargetAssemblyTypeName: GameControlMultiplayer, Assembly-CSharp
-        m_MethodName: TestTurn
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2106016489}
-        m_TargetAssemblyTypeName: GameControlMultiplayer, Assembly-CSharp
-        m_MethodName: TestMovimiento
+        m_MethodName: BotonAvanzarTurno
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2663,6 +2652,7 @@ GameObject:
   - component: {fileID: 1557488253}
   - component: {fileID: 1557488252}
   - component: {fileID: 1557488255}
+  - component: {fileID: 1557488256}
   m_Layer: 0
   m_Name: Dado
   m_TagString: Untagged
@@ -2801,6 +2791,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4755c652e77e6b34ca7a53198e5cb445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestClick
+--- !u!114 &1557488256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557488250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1166d140f7ffa1b418c1f366d0989ac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DadoMultiplayer
 --- !u!1 &1569375254
 GameObject:
   m_ObjectHideFlags: 0
@@ -3688,6 +3690,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2106016488}
   - component: {fileID: 2106016489}
+  - component: {fileID: 2106016490}
   m_Layer: 0
   m_Name: GameControl
   m_TagString: Untagged
@@ -3722,6 +3725,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f08ecf353254f24ea018b74015eb0ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameControlMultiplayer
+--- !u!114 &2106016490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106016486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &2128241233
 GameObject:
   m_ObjectHideFlags: 0

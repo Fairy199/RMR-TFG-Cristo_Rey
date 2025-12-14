@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 public class LeaderboardManager : MonoBehaviour
 {
     [Header("Leaderboard UI")]
-    public Transform contentPanel;      // El Content del Scroll
-    public GameObject entryPrefab;      // Prefab con el script LeaderboardEntry
+    public Transform contentPanel;       
+    public GameObject entryPrefab;      
 
     private FirebaseControlador firebase;
 
@@ -38,40 +38,40 @@ public class LeaderboardManager : MonoBehaviour
             return;
         }
 
-        // Limpiar contenido previo
         foreach (Transform child in contentPanel)
             Destroy(child.gameObject);
 
-        // Recorrer cada usuario en LeaderBoard
+        List<RankingData> rankingList = new List<RankingData>();
+
         foreach (var child in snapshot.Children)
         {
             var usernameValue = child.Child("username")?.Value;
             var scoreValue = child.Child("score")?.Value;
 
             if (usernameValue == null || scoreValue == null)
-            {
-                Debug.LogWarning($"Usuario {child.Key} tiene datos inválidos.");
                 continue;
-            }
 
-            string username = usernameValue.ToString();
-            string score = scoreValue.ToString();
+            rankingList.Add(new RankingData(
+                usernameValue.ToString(),
+                int.Parse(scoreValue.ToString())
+            ));
+        }
 
-            // Instanciar prefab
+        rankingList.Sort((a, b) => b.score.CompareTo(a.score));
+
+        for (int i = 0; i < rankingList.Count; i++)
+        {
             GameObject newEntry = Instantiate(entryPrefab, contentPanel);
             newEntry.transform.localScale = Vector3.one;
 
-            // Asignar valores usando el script LeaderboardEntry
             var entryScript = newEntry.GetComponent<LeaderBoardEntry>();
             if (entryScript != null)
             {
-                entryScript.usernameText.text = username;
-                entryScript.scoreText.text = score;
-            }
-            else
-            {
-                Debug.LogError("El prefab necesita el script LeaderboardEntry con referencias asignadas.");
-                Destroy(newEntry);
+                entryScript.SetData(
+                    i + 1,                            
+                    rankingList[i].playerName,       
+                    rankingList[i].score             
+                );
             }
         }
     }

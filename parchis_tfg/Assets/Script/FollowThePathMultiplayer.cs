@@ -6,18 +6,16 @@ public class FollowThePathMultiplayer : MonoBehaviourPun
     public Transform[] PuntoDeCamino;
     public float moveSpeed = 2f;
 
-    [HideInInspector]
-    public int PuntoDeCaminoIndex = 0;
+    [HideInInspector] public int PuntoDeCaminoIndex = 0;
 
     private int pasosRestantes = 0;
     private bool puedesMoverte = false;
 
     public CasillaEspecial[] casillasEspeciales;
 
-    // Mueve la ficha local y sincroniza con los demás
     public void Mover(int pasos)
     {
-        if (photonView.IsMine) // Solo el propietario mueve
+        if (photonView.IsMine)
         {
             pasosRestantes = pasos;
             puedesMoverte = true;
@@ -56,6 +54,10 @@ public class FollowThePathMultiplayer : MonoBehaviourPun
                 {
                     puedesMoverte = false;
                     RevisarCasillaEspecial();
+
+                    // Si NO repite turno, pasar turno
+                    if (photonView.IsMine)
+                        GameControlMultiplayer.AvanzarTurno();
                 }
             }
         }
@@ -64,6 +66,7 @@ public class FollowThePathMultiplayer : MonoBehaviourPun
     private void RevisarCasillaEspecial()
     {
         int casillaActual = PuntoDeCaminoIndex - 1;
+
         foreach (var casilla in casillasEspeciales)
         {
             if (casillaActual == casilla.casillaOrigen)

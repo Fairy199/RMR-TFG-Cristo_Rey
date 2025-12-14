@@ -41,6 +41,12 @@ MonoBehaviour:
   - RespawnSpaceship
   - RPC_SetCasillasRestantes
   - RPC_SetPasosRestantes
+  - RPC_JugarTurno
+  - RPC_TestMovimientoGlobal
+  - RPC_TestTurnoGlobal
+  - RPC_SyncTurno
+  - RPC_MoverYAvanzarTurno
+  - RPC_ResultadoDado
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
