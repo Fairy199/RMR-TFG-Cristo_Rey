@@ -92,10 +92,6 @@ public class GestorPhotom : MonoBehaviourPunCallbacks
                     nickName.GetComponent<TMP_Text>().text = item.Value.NickName;
                 }
             }
-
-            //PhotonNetwork.CurrentRoom.Players[0].NickName;
-            
-
         }
     }
 

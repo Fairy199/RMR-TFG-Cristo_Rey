@@ -15,29 +15,29 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
     private static TMP_Text quienGanaTexto;
     private static TMP_Text jugadorMueveTexto;
 
-    // -------------------------------
-    // TURNO GLOBAL SINCRONIZADO
-    // -------------------------------
-    public static int Turno
+
+    public static int GetTurno()
     {
-        get
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("turno"))
         {
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("turno", out object value))
-                return (int)value;
-            return 1;
+            return (int)PhotonNetwork.CurrentRoom.CustomProperties["turno"];
         }
-        set
-        {
-            ExitGames.Client.Photon.Hashtable h = new ExitGames.Client.Photon.Hashtable();
-            h["turno"] = value;
-            PhotonNetwork.CurrentRoom.SetCustomProperties(h);
-        }
+        return 0;
     }
+
+    public static void SetTurno(int nuevoTurno)
+    {
+        ExitGames.Client.Photon.Hashtable h = new ExitGames.Client.Photon.Hashtable();
+        h["turno"] = nuevoTurno;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+    }
+
 
     void Start()
     {
         quienGanaTexto = GameObject.Find("quienGanaTexto").GetComponent<TMP_Text>();
         jugadorMueveTexto = GameObject.Find("jugador1MueveTexto").GetComponent<TMP_Text>();
+
         quienGanaTexto.gameObject.SetActive(false);
         jugadorMueveTexto.gameObject.SetActive(false);
 
@@ -45,7 +45,7 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient)
         {
-            Turno = 1; // SOLO EL MASTER MARCA EL TURNO INICIAL
+            SetTurno(1);
         }
 
         RegisterLocalPlayer();
@@ -54,11 +54,16 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
 
     private void RegisterLocalPlayer()
     {
-        foreach (var go in GameObject.FindGameObjectsWithTag("Player"))
+        GameObject[] objetos = GameObject.FindGameObjectsWithTag("Player");
+
+        for (int i = 0; i < objetos.Length; i++)
         {
-            var ftp = go.GetComponent<FollowThePathMultiplayer>();
+            FollowThePathMultiplayer ftp = objetos[i].GetComponent<FollowThePathMultiplayer>();
+
             if (ftp != null && ftp.photonView.IsMine)
+            {
                 RegisterPlayer(ftp);
+            }
         }
     }
 
@@ -67,7 +72,7 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
         if (!players.Contains(ftp))
         {
             players.Add(ftp);
-            Debug.Log($">> Jugador registrado: {ftp.name}");
+            Debug.Log(">> Jugador registrado: " + ftp.name);
         }
     }
 
@@ -78,107 +83,128 @@ public class GameControlMultiplayer : MonoBehaviourPunCallbacks
 
     private IEnumerator WaitAndRegister(int actorNumber)
     {
-        PhotonView pv = null;
-        while (pv == null)
+        PhotonView encontrado = null;
+
+        while (encontrado == null)
         {
-            foreach (var view in FindObjectsOfType<PhotonView>())
+            PhotonView[] vistas = FindObjectsOfType<PhotonView>();
+
+            for (int i = 0; i < vistas.Length; i++)
             {
-                if (view.Owner != null && view.Owner.ActorNumber == actorNumber)
+                if (vistas[i].Owner != null &&
+                    vistas[i].Owner.ActorNumber == actorNumber)
                 {
-                    pv = view;
-                    break;
+                    encontrado = vistas[i];
                 }
             }
+
             yield return null;
         }
 
-        var ftp = pv.GetComponent<FollowThePathMultiplayer>();
-        if (ftp != null) RegisterPlayer(ftp);
+        FollowThePathMultiplayer ftp = encontrado.GetComponent<FollowThePathMultiplayer>();
+
+        if (ftp != null)
+        {
+            RegisterPlayer(ftp);
+        }
     }
 
     void Update()
     {
-        if (gameOver || players.Count == 0) return;
-
-        foreach (var player in players)
+        if (!gameOver && players.Count > 0)
         {
-            if (player.PuntoDeCaminoIndex >= player.PuntoDeCamino.Length)
+            for (int i = 0; i < players.Count; i++)
             {
-                quienGanaTexto.gameObject.SetActive(true);
-                int jugadorNum = players.IndexOf(player) + 1;
-                quienGanaTexto.text = $"Jugador {jugadorNum} gana";
-                gameOver = true;
+                if (players[i].PuntoDeCaminoIndex >= players[i].PuntoDeCamino.Length)
+                {
+                    quienGanaTexto.gameObject.SetActive(true);
+                    quienGanaTexto.text = "Jugador " + (i + 1) + " gana";
+                    gameOver = true;
+                }
             }
         }
     }
 
-    // ------------------------------------
-    //       MÉTODOS DE TURNOS
-    // ------------------------------------
-
     public static void AvanzarTurno()
     {
-        int nuevo = Turno + 1;
-        if (nuevo > players.Count) nuevo = 1;
-        Turno = nuevo;
+        int turnoActual = GetTurno();
+        int nuevoTurno = turnoActual + 1;
+
+        if (nuevoTurno > players.Count)
+        {
+            nuevoTurno = 1;
+        }
+
+        SetTurno(nuevoTurno);
     }
 
     public static void RepetirTurno()
     {
-        int nuevo = Turno - 1;
-        if (nuevo < 1) nuevo = players.Count;
-        Turno = nuevo;
+        int turnoActual = GetTurno();
+        int nuevoTurno = turnoActual - 1;
+
+        if (nuevoTurno < 1)
+        {
+            nuevoTurno = players.Count;
+        }
+
+        SetTurno(nuevoTurno);
     }
 
     private static void ActualizarTurnoUI()
     {
         if (jugadorMueveTexto != null)
-            jugadorMueveTexto.text = $"Turno jugador {Turno}";
+        {
+            jugadorMueveTexto.text = "Turno jugador " + GetTurno();
+        }
     }
 
-    // 👇 AQUÍ ESTABA EL ERROR (ya corregido)
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable changed)
     {
         if (changed.ContainsKey("turno"))
+        {
             ActualizarTurnoUI();
+        }
     }
 
-    // ------------------------------------
-    //      MÉTODOS DE TEST Y MOVIMIENTO
-    // ------------------------------------
 
     public static void TestTurn()
     {
-        FollowThePathMultiplayer jugadorActual = players[Turno - 1];
+        int turnoActual = GetTurno();
+        FollowThePathMultiplayer jugadorActual = players[turnoActual - 1];
 
-        if (!jugadorActual.photonView.IsMine)
+        if (jugadorActual.photonView.IsMine)
+        {
+            jugadorActual.Mover(diceSideThrown);
+            AvanzarTurno();
+        }
+        else
         {
             Debug.Log(">> No es tu turno.");
-            return;
         }
-
-        jugadorActual.Mover(diceSideThrown);
-        AvanzarTurno();
     }
 
     public static void TestMovimiento()
     {
-        FollowThePathMultiplayer jugadorActual = players[Turno - 1];
+        int turnoActual = GetTurno();
+        FollowThePathMultiplayer jugadorActual = players[turnoActual - 1];
 
-        if (!jugadorActual.photonView.IsMine)
+        if (jugadorActual.photonView.IsMine)
+        {
+            jugadorActual.Mover(3);
+        }
+        else
         {
             Debug.Log(">> No es tu turno.");
-            return;
         }
-
-        jugadorActual.Mover(3);
     }
 
     public static bool TurnoJugadorSoyYo()
     {
-        if (players.Count == 0) return false;
+        if (players.Count == 0)
+            return false;
 
-        return players[Turno - 1].photonView.IsMine;
+        int turnoActual = GetTurno();
+        return players[turnoActual - 1].photonView.IsMine;
     }
-
 }

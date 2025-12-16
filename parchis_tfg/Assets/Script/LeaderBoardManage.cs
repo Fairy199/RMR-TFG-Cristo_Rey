@@ -14,11 +14,9 @@ public class LeaderboardManager : MonoBehaviour
 
     private async void Start()
     {
-        // Inicializar Firebase
         firebase = new FirebaseControlador();
         await firebase.InitializeFirebaseAsync();
 
-        // Cargar leaderboard
         await LoadLeaderboard();
     }
 
@@ -38,6 +36,7 @@ public class LeaderboardManager : MonoBehaviour
             return;
         }
 
+
         foreach (Transform child in contentPanel)
             Destroy(child.gameObject);
 
@@ -48,17 +47,18 @@ public class LeaderboardManager : MonoBehaviour
             var usernameValue = child.Child("username")?.Value;
             var scoreValue = child.Child("score")?.Value;
 
-            if (usernameValue == null || scoreValue == null)
-                continue;
-
-            rankingList.Add(new RankingData(
-                usernameValue.ToString(),
-                int.Parse(scoreValue.ToString())
-            ));
+            if (usernameValue != null && scoreValue != null)
+            {
+                rankingList.Add(new RankingData(
+                    usernameValue.ToString(),
+                    int.Parse(scoreValue.ToString())
+                ));
+            }
         }
 
         rankingList.Sort((a, b) => b.score.CompareTo(a.score));
 
+       
         for (int i = 0; i < rankingList.Count; i++)
         {
             GameObject newEntry = Instantiate(entryPrefab, contentPanel);
@@ -68,9 +68,9 @@ public class LeaderboardManager : MonoBehaviour
             if (entryScript != null)
             {
                 entryScript.SetData(
-                    i + 1,                            
-                    rankingList[i].playerName,       
-                    rankingList[i].score             
+                    i + 1,                             
+                    rankingList[i].playerName,         
+                    rankingList[i].score              
                 );
             }
         }

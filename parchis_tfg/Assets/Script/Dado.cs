@@ -11,40 +11,56 @@ public class Dado : MonoBehaviour
     private void Start()
     {
         rend = GetComponent<SpriteRenderer>();
-
         carasDado = Resources.LoadAll<Sprite>("Dados");
 
         if (carasDado.Length == 0)
+        {
             Debug.LogError("No se encontraron sprites del dado en Resources/Dados");
-
-        rend.sprite = carasDado[5];
+        }
+        else
+        {
+            rend.sprite = carasDado[5];
+        }
     }
 
     private void Update()
     {
-        if (GameControl.gameOver || !GameControl.puedeTirar || !coroutineAllowed)
-            return;
-
-        // --- Jugador 1: tirar con espacio o clic ---
-        if (GameControl.turno == 1 && Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (!GameControl.gameOver)
         {
-            StartCoroutine(TirarElDado());
-            return;
-        }
-
-        // --- Jugador 2 AUTOMÁTICO ---
-        if (GameControl.turno == 2)
-        {
-            StartCoroutine(TirarElDado());
-            return;
+            if (GameControl.puedeTirar)
+            {
+                if (coroutineAllowed)
+                {
+                    if (GameControl.turno == 1)
+                    {
+                        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+                        {
+                            StartCoroutine(TirarElDado());
+                        }
+                    }
+                    else if (GameControl.turno == 2)
+                    {
+                        StartCoroutine(TirarElDado());
+                    }
+                }
+            }
         }
     }
 
     private void OnMouseDown()
     {
-        if (!GameControl.gameOver && GameControl.puedeTirar && coroutineAllowed && GameControl.turno == 1)
+        if (!GameControl.gameOver)
         {
-            StartCoroutine(TirarElDado());
+            if (GameControl.puedeTirar)
+            {
+                if (coroutineAllowed)
+                {
+                    if (GameControl.turno == 1)
+                    {
+                        StartCoroutine(TirarElDado());
+                    }
+                }
+            }
         }
     }
 
@@ -62,7 +78,6 @@ public class Dado : MonoBehaviour
         }
 
         GameControl.diceSideThrown = numeroDadoRandom + 1;
-
         GameControl.JugarTurno();
 
         coroutineAllowed = true;

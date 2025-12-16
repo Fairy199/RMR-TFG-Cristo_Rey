@@ -17,34 +17,55 @@ public class MovimientoFichaMultiplayer : MonoBehaviourPun
         {
             int cantidad = casillasPadre.childCount;
             casillas = new Transform[cantidad];
+
             for (int i = 0; i < cantidad; i++)
+            {
                 casillas[i] = casillasPadre.GetChild(i);
+            }
         }
 
-        if (casillas.Length > 0)
+        if (casillas != null && casillas.Length > 0)
+        {
             transform.position = casillas[indiceCasillaActual].position;
+        }
     }
 
     private void Update()
     {
-        if (!photonView.IsMine) return; // Solo mueve el propietario
+        if (photonView.IsMine)
+        {
+            if (moviendo)
+            {
+                MoverAutomatico();
+            }
 
-        if (moviendo) MoverAutomatico();
-        if (Input.GetKeyDown(KeyCode.Space)) Mover(3);
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Mover(3);
+            }
+        }
     }
 
     public void Mover(int numeroCasillas)
     {
-        if (!moviendo && casillas.Length > 0)
+        if (!moviendo)
         {
-            casillasRestantes = numeroCasillas;
-            moviendo = true;
-            photonView.RPC("RPC_SetCasillasRestantes", RpcTarget.OthersBuffered, numeroCasillas);
+            if (casillas != null && casillas.Length > 0)
+            {
+                casillasRestantes = numeroCasillas;
+                moviendo = true;
+
+                photonView.RPC(
+                    "RPC_SetCasillasRestantes",
+                    RpcTarget.OthersBuffered,
+                    numeroCasillas
+                );
+            }
         }
     }
 
     [PunRPC]
-    void RPC_SetCasillasRestantes(int numero)
+    private void RPC_SetCasillasRestantes(int numero)
     {
         casillasRestantes = numero;
         moviendo = true;
@@ -52,18 +73,37 @@ public class MovimientoFichaMultiplayer : MonoBehaviourPun
 
     private void MoverAutomatico()
     {
-        if (casillasRestantes > 0 && indiceCasillaActual < casillas.Length - 1)
+        if (casillasRestantes > 0)
         {
-            Vector3 destino = casillas[indiceCasillaActual + 1].position;
-            transform.position = Vector3.MoveTowards(transform.position, destino, velocidadMovimiento * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, destino) < 0.2f)
+            if (indiceCasillaActual < casillas.Length - 1)
             {
-                indiceCasillaActual++;
-                casillasRestantes--;
-                if (casillasRestantes == 0) moviendo = false;
+                Vector3 destino = casillas[indiceCasillaActual + 1].position;
+
+                transform.position = Vector3.MoveTowards(
+                    transform.position,
+                    destino,
+                    velocidadMovimiento * Time.deltaTime
+                );
+
+                if (Vector3.Distance(transform.position, destino) < 0.2f)
+                {
+                    indiceCasillaActual++;
+                    casillasRestantes--;
+
+                    if (casillasRestantes == 0)
+                    {
+                        moviendo = false;
+                    }
+                }
+            }
+            else
+            {
+                moviendo = false;
             }
         }
-        else moviendo = false;
+        else
+        {
+            moviendo = false;
+        }
     }
 }

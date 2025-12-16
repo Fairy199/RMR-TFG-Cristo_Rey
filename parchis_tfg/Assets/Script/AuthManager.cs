@@ -127,7 +127,7 @@ public class AuthManager : MonoBehaviour
         {
             user = registerTask.Result.User;
 
-            // Actualizar nombre visible
+
             UserProfile profile = new UserProfile { DisplayName = username };
             var profileTask = user.UpdateUserProfileAsync(profile);
 
@@ -141,16 +141,14 @@ public class AuthManager : MonoBehaviour
             {
                 confirmRegisterText.text = "Register successful!";
 
-                // <<< DESACTIVAR BOTONES
                 registerButtons.SetActive(false);
 
-                // <<< ESPERAR 2 SEGUNDOS Y VOLVER
                 StartCoroutine(ReturnToLoginAfterDelay());
             }
         }
     }
 
-    // <<< NUEVO
+   
     private IEnumerator ReturnToLoginAfterDelay()
     {
         yield return new WaitForSeconds(2f);

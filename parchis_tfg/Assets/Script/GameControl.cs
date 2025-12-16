@@ -16,11 +16,9 @@ public class GameControl : MonoBehaviour
 
     public static int turno = 1;
 
-    // Nombres de jugadores
     public static string jugador1Nombre = "Jugador 1";
     public static string jugador2Nombre = "Jugador 2";
 
-    // Singleton para acceder desde FirebaseControlador
     public static GameControl instance;
 
     void Awake()
@@ -39,11 +37,9 @@ public class GameControl : MonoBehaviour
 
         quienGanaTexto.SetActive(false);
 
-        // Actualiza los textos con los nombres actuales (por defecto o asignados desde Firebase)
         ActualizarTextoTurno();
     }
 
-    // Método para actualizar nombre de jugador 1 dinámicamente
     public void ActualizarNombreJugador1(string nombre)
     {
         jugador1Nombre = nombre;
@@ -54,29 +50,31 @@ public class GameControl : MonoBehaviour
     {
         if (jugador1MueveTexto != null)
             jugador1MueveTexto.GetComponent<TMP_Text>().text = jugador1Nombre + " mueve";
+
         if (jugador2MueveTexto != null)
             jugador2MueveTexto.GetComponent<TMP_Text>().text = jugador2Nombre + " mueve";
     }
 
     public static void JugarTurno()
     {
-        if (gameOver || !puedeTirar) return;
-
-        puedeTirar = false;
-
-        if (turno == 1)
+        if (!gameOver && puedeTirar)
         {
-            jugador1Path.Mover(diceSideThrown);
-            jugador1MueveTexto.SetActive(false);
-            jugador2MueveTexto.SetActive(true);
-            turno = 2;
-        }
-        else
-        {
-            jugador2Path.Mover(diceSideThrown);
-            jugador2MueveTexto.SetActive(false);
-            jugador1MueveTexto.SetActive(true);
-            turno = 1;
+            puedeTirar = false;
+
+            if (turno == 1)
+            {
+                jugador1Path.Mover(diceSideThrown);
+                jugador1MueveTexto.SetActive(false);
+                jugador2MueveTexto.SetActive(true);
+                turno = 2;
+            }
+            else
+            {
+                jugador2Path.Mover(diceSideThrown);
+                jugador2MueveTexto.SetActive(false);
+                jugador1MueveTexto.SetActive(true);
+                turno = 1;
+            }
         }
     }
 
